@@ -1,103 +1,55 @@
 <?php
-require_once 'header.php';
-require_once 'sidebar.php';
-?>
 
-<!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Dashboard Website</h1>
-                </div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
 
-    <!-- Main content -->
-    <section class="content">
+define('LARAVEL_START', microtime(true));
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <!-- Default box -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Tabel Paramedik</h3>
+/*
+|--------------------------------------------------------------------------
+| Check If The Application Is Under Maintenance
+|--------------------------------------------------------------------------
+|
+| If the application is in maintenance / demo mode via the "down" command
+| we will load this file so that any pre-rendered content can be shown
+| instead of starting the framework, which could cause an exception.
+|
+*/
 
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="text-center">Data Paramedik</h2>
-                            <a href="add.php"><button class="btn btn-primary mb-1">Tambah Data</button></a>
-                            <table class="table table-striped text-center">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nama</th>
-                                        <th>Jenis Kelamin</th>
-                                        <th>Tempat Lahir</th>
-                                        <th>Tanggal Lahir</th>
-                                        <th>Kategori</th>
-                                        <th>Telpon</th>
-                                        <th>Alamat</th>
-                                        <th>Unit Kerja ID</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    // Panggil file
-                                    require '../dbkoneksi.php';
-                                    // Bikin Query SQL
-                                    $query = $dbh->query("SELECT * FROM paramedik");
-                                    // Tampilkan data looping
-                                    foreach ($query as $row) {
-                                        echo "<tr>";
-                                        echo "<td>" . $row['id'] . "</td>";
-                                        echo "<td>" . $row['nama'] . "</td>";
-                                        echo "<td>" . $row['gender'] . "</td>";
-                                        echo "<td>" . $row['tmp_lahir'] . "</td>";
-                                        echo "<td>" . $row['tgl_lahir'] . "</td>";
-                                        echo "<td>" . $row['kategori'] . "</td>";
-                                        echo "<td>" . $row['telpon'] . "</td>";
-                                        echo "<td>" . $row['alamat'] . "</td>";
-                                        echo "<td>" . $row['unit_kerja_id'] . "</td>";
-                                        echo "<td>";
-                                        echo "<a href='edit.php?id=" . $row['id'] . "'><button class='btn btn-primary'>Edit</button></a>";
-                                        echo "<span class='mx-1'></span>";
-                                        echo "<a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"Yakin Hapus Data?\")'><button class='btn btn-danger'>Delete</button></a>";
-                                        echo "</td>";
-                                        echo "</tr>";
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                        <div class="card-footer">
-                            Projek 1
-                        </div>
-                        <!-- /.card-footer-->
-                    </div>
-                    <!-- /.card -->
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- /.content -->
-</div>
-<!-- /.content-wrapper -->
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
 
-<?php
-require_once 'footer.php';
-?>
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| this application. We just need to utilize it! We'll simply require it
+| into the script here so we don't need to manually load our classes.
+|
+*/
+
+require __DIR__.'/../vendor/autoload.php';
+
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request using
+| the application's HTTP kernel. Then, we will send the response back
+| to this client's browser, allowing them to enjoy our application.
+|
+*/
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);
